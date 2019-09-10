@@ -1,0 +1,10 @@
+D:\Projects\Musescore\Musedownloader\bin\Debug\Musedownloader.exe.config
+D:\Projects\Musescore\Musedownloader\bin\Debug\Musedownloader.exe
+D:\Projects\Musescore\Musedownloader\bin\Debug\Musedownloader.pdb
+D:\Projects\Musescore\Musedownloader\bin\Debug\HtmlAgilityPack.dll
+D:\Projects\Musescore\Musedownloader\bin\Debug\HtmlAgilityPack.pdb
+D:\Projects\Musescore\Musedownloader\bin\Debug\HtmlAgilityPack.xml
+D:\Projects\Musescore\Musedownloader\obj\Debug\Musedownloader.csproj.CoreCompileInputs.cache
+D:\Projects\Musescore\Musedownloader\obj\Debug\Musedownloader.csproj.CopyComplete
+D:\Projects\Musescore\Musedownloader\obj\Debug\Musedownloader.exe
+D:\Projects\Musescore\Musedownloader\obj\Debug\Musedownloader.pdb
