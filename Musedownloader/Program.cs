@@ -17,12 +17,64 @@ namespace Musedownloader
         static int downloadedCount = 0;
         static int errorCount = 0;
 
+        static bool error = false;
+
         static List<Category> cats = new List<Category>();
         static List<Song> songs = new List<Song>();
 
-        static void Main(string[] args)
+        static void SingleMode()
         {
-            Console.Title = "Musescore - Downloader";
+            Console.Clear();
+            try
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write("Parçanın adresi (URL): ");
+                Console.ForegroundColor = ConsoleColor.White;
+                string s = Console.ReadLine();
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                string source = HttpMethods.Get(s, s, ref HttpMethods.cookies);
+                string title = HttpMethods.GetBetween(source, "<h1>", "</h1>");
+                string midiUrl = HttpMethods.GetBetween(source, "{\"midi\":", "?revision=");
+                using (var client = new WebClient())
+                {
+                    string filename = title.Replace("\n", "").Trim() + ".mid";
+                    string path = AppDomain.CurrentDomain.BaseDirectory + "Downloads\\" + filename;
+
+                    if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + "Downloads\\" + filename))
+                    {
+                        if (!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "Downloads\\"))
+                        {
+                            Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + "Downloads\\");
+                        }
+                        midiUrl = midiUrl.Replace("\\", "");
+                        midiUrl = midiUrl.Replace("\"", "");
+                        try
+                        {
+                            client.DownloadFile(midiUrl, path);
+                            Console.WriteLine("İndirilen dosya: {0}", filename);
+                            downloadedCount++;
+                        }
+                        catch (System.Net.WebException)
+                        {
+                            Console.WriteLine("Dosya indirilemedi, karakter hatası. ({0})", filename);
+                            errorCount++;
+                        }
+                    }
+                }
+                Console.Write("Ana menüye dönmek için bir tuşa basınız...");Console.ReadKey();
+
+            }
+            catch (Exception)
+            {
+                Console.Clear();
+                Console.Write("Bir hata meydana geldi\n\nProgramdan çıkmak için bir tuşa basınız...");
+                Console.ReadKey();
+            }
+        }
+
+        static void CategoryMode()
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
             HtmlDocument doc = new HtmlDocument();
             try
             {
@@ -56,10 +108,13 @@ namespace Musedownloader
 
             int cat = 0;
             Console.Write("\nKategori numarası giriniz: ");
+            Console.ForegroundColor = ConsoleColor.White;
             if (!int.TryParse(Console.ReadLine(), out cat))
             {
-                Main(args);
+                CategoryMode();
+                return;
             }
+            Console.ForegroundColor = ConsoleColor.Yellow;
 
             Console.Clear();
             for (int pageIndex = 1; pageIndex < 101; pageIndex++)
@@ -124,8 +179,48 @@ namespace Musedownloader
             Console.Clear();
             Console.WriteLine("{0} adet müzik indirildi.", downloadedCount);
             Console.WriteLine("{0} adet hata var.", errorCount);
-            Console.Write("\n\nProgramdan çıkmak için bir tuşa basın...");
+            Console.Write("\n\nAna menüye dönmek için bir tuşa basın...");
             Console.ReadKey();
+        }
+
+        static void Main(string[] args)
+        {
+            Console.Title = "Musescore - Downloader";
+
+            while (true)
+            {
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("1 - Tek şarkı indir");
+                Console.WriteLine("2 - Kategori seç ve komple indir (VPN Kullanın IP ban yiyorsunuz)");
+                Console.WriteLine("\n\n0 - Programdan Çık");
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write("\nİşlem numarası girin: ");
+                Console.ForegroundColor = ConsoleColor.White;
+                if (int.TryParse(Console.ReadLine(), out int opt))
+                {
+                    if (opt == 1)
+                    {
+                        SingleMode();
+                        if (error)
+                        {
+                            return;
+                        }
+                    }
+                    else if (opt == 2)
+                    {
+                        CategoryMode();
+                        if (error)
+                        {
+                            return;
+                        }
+                    }
+                    else if (opt == 0)
+                    {
+                        return;
+                    }
+                }
+            }
         }
     }
 }
